@@ -2,6 +2,7 @@ import { Mail, Phone } from "lucide-react";
 import { site } from "@/config/site";
 import { scrollTo } from "@/lib/lenis";
 import { IconeInstagram, IconeFacebook } from "@/components/ui/IconesSociais";
+import { Logo } from "@/components/ui/Logo";
 
 /**
  * 09 · Footer — BRIEF §4.
@@ -16,9 +17,7 @@ export function Footer() {
       <div className="container-lp py-16 md:py-20">
         <div className="grid gap-12 md:grid-cols-[1.4fr_1fr_1fr]">
           <div>
-            <p className="fonte-display text-3xl leading-none">
-              Supreme<span className="text-supreme">.</span>
-            </p>
+            <Logo tamanho="md" />
             <p className="peso-variavel mt-4 max-w-[34ch] text-sm leading-relaxed text-aco">
               {site.slogan}
             </p>

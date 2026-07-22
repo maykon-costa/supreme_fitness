@@ -20,7 +20,16 @@ export function Hero() {
     () => {
       if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-      // Entrada dos blocos de apoio (a headline tem seu próprio reveal)
+      // Headline entrando linha a linha sob máscara
+      gsap.from("[data-hero-linha]", {
+        yPercent: 108,
+        duration: 1.1,
+        stagger: 0.11,
+        delay: 1.15, // depois do preloader
+        ease: "expo.out",
+      });
+
+      // Entrada dos blocos de apoio
       gsap.from("[data-hero-fade]", {
         y: 26,
         opacity: 0,
@@ -164,15 +173,15 @@ export function Hero() {
           {site.hero.sobretitulo}
         </p>
 
+        {/* O reveal é feito em GSAP (ver useGSAP acima), não em @keyframes CSS:
+            era a única animação da página presa ao document timeline, com um
+            delay longo. Se esse relógio atrasa, a headline fica invisível —
+            risco que não vale correr no elemento mais importante da página.
+            Também alinha com o LP_GUIDE §1: GSAP é o dono dos reveals. */}
         <h1 className="fonte-display titulo-xl max-w-[16ch]">
           {site.hero.titulo.map((linha, i) => (
             <span key={i} className="linha-mascara">
-              <span
-                className="block"
-                style={{
-                  animation: `heroLinha 1.1s cubic-bezier(0.16,1,0.3,1) ${1.15 + i * 0.11}s both`,
-                }}
-              >
+              <span className="block" data-hero-linha>
                 {i === site.hero.titulo.length - 1 ? (
                   <>
                     A GENTE <span className="text-supreme">TREINA.</span>
@@ -219,15 +228,6 @@ export function Hero() {
         <ArrowDown size={16} className="indicador-scroll" aria-hidden="true" />
       </button>
 
-      <style>{`
-        @keyframes heroLinha {
-          from { transform: translateY(108%); }
-          to   { transform: translateY(0); }
-        }
-        @media (prefers-reduced-motion: reduce) {
-          @keyframes heroLinha { from { transform: none } to { transform: none } }
-        }
-      `}</style>
     </section>
   );
 }

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { m, AnimatePresence } from "motion/react";
 import { Menu, X } from "lucide-react";
 import { IconeInstagram } from "@/components/ui/IconesSociais";
+import { Logo } from "@/components/ui/Logo";
 import { site } from "@/config/site";
 import { scrollTo, pararScroll, retomarScroll } from "@/lib/lenis";
 import { BtnAgend } from "@/components/ui/BtnAgend";
@@ -62,9 +63,8 @@ export function Header() {
               e.preventDefault();
               irPara("#hero");
             }}
-            className="fonte-display text-xl leading-none md:text-2xl"
           >
-            Supreme<span className="text-supreme">.</span>
+            <Logo tamanho="sm" />
           </a>
 
           <nav aria-label="Principal" className="hidden items-center gap-8 lg:flex">

@@ -151,7 +151,7 @@ export const site = {
     {
       id: "mensal",
       nome: "Mensal",
-      preco: 89.9,
+      preco: 169.9,
       periodo: "/mês",
       chamada: "Sem fidelidade",
       destaque: false,
@@ -165,7 +165,7 @@ export const site = {
     {
       id: "trimestral",
       nome: "Trimestral",
-      preco: 79.9,
+      preco: 149.9,
       periodo: "/mês",
       chamada: "O mais escolhido",
       destaque: true,
@@ -179,7 +179,7 @@ export const site = {
     {
       id: "anual",
       nome: "Anual",
-      preco: 69.9,
+      preco: 119.9,
       periodo: "/mês",
       chamada: "Melhor custo",
       destaque: false,

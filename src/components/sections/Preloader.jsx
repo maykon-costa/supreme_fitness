@@ -46,6 +46,16 @@ export function Preloader() {
         delay: (_, i) => 90 * i,
         ease: "out(3)",
       });
+
+      // O bloco "FITNESS" entra depois das 7 letras de SUPREME, crescendo
+      // a partir da esquerda — como se a caixa fosse "carimbada" na marca.
+      animate(".preloader-caixa", {
+        scaleX: [{ from: 0 }],
+        opacity: [{ from: 0 }],
+        duration: 520,
+        delay: 7 * 90 + 60,
+        ease: "out(3)",
+      });
     });
 
     const fim = window.setTimeout(() => setPronto(true), 1200);
@@ -77,18 +87,32 @@ export function Preloader() {
           aria-live="polite"
           aria-label="Carregando"
         >
-          <div className="flex items-end gap-1 overflow-hidden">
-            {"SUPREME".split("").map((letra, i) => (
-              <span
-                key={i}
-                className="preloader-letra fonte-display text-[clamp(2.5rem,9vw,6rem)] leading-none"
-              >
-                {letra}
-              </span>
-            ))}
+          {/* Lockup da marca montado letra a letra — por isso não usa <Logo/>,
+              que é o lockup estático. O retângulo amarelo é o mesmo. */}
+          <div
+            className="fonte-display flex flex-col items-center leading-none"
+            role="img"
+            aria-label="Supreme Fitness"
+          >
+            <div aria-hidden="true" className="flex items-end gap-1 overflow-hidden">
+              {"SUPREME".split("").map((letra, i) => (
+                <span
+                  key={i}
+                  className="preloader-letra text-[clamp(2.5rem,9vw,6rem)]"
+                >
+                  {letra}
+                </span>
+              ))}
+            </div>
+            <span
+              aria-hidden="true"
+              className="preloader-caixa mt-2 origin-left bg-supreme px-3 py-1 text-[clamp(0.85rem,3vw,2rem)] tracking-[0.18em] text-carbono"
+            >
+              Fitness
+            </span>
           </div>
 
-          <p className="mt-5 text-[10px] font-semibold tracking-[0.42em] text-aco uppercase">
+          <p className="mt-6 text-[10px] font-semibold tracking-[0.42em] text-aco uppercase">
             Aquecimento
           </p>
 
