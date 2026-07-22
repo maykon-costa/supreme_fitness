@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(echo \"LINT_EXIT=$?\")",
+      "Bash(ls \"/c/Program Files \\(x86\\)/Microsoft/Edge/Application/msedge.exe\" \"/c/Program Files/Google/Chrome/Application/chrome.exe\" 2>/dev/null)",
+      "Read(//c/Program Files \\\\\\(x86\\\\\\)/Microsoft/Edge/Application/**)",
+      "Bash(\"/c/Program Files/Google/Chrome/Application/chrome.exe\" --headless=new --disable-gpu --no-sandbox --virtual-time-budget=6000 --dump-dom http://localhost:4173/)",
+      "Read(//tmp/**)",
+      "Bash(grep -oE \"\\(Aberto|Fechado\\)[^<]{0,30}\" /tmp/dom.html)",
+      "Bash(grep -oE \"R\\\\\\\\$</span>[^!]{0,120}\" /tmp/dom.html)",
+      "Bash(\"/c/Program Files/Google/Chrome/Application/chrome.exe\" --headless=new --disable-gpu --no-sandbox --enable-logging=stderr --v=0 --virtual-time-budget=7000 --dump-dom http://localhost:4173/)",
+      "Bash(\"/c/Program Files/Google/Chrome/Application/chrome.exe\" --headless=new --no-sandbox --window-size=1440,900 --use-gl=swiftshader --enable-unsafe-swiftshader --enable-logging=stderr --v=0 --virtual-time-budget=9000 --dump-dom http://localhost:4173/)",
+      "Bash(node eval.mjs \"http://localhost:4173/\" 'document.querySelector\\(\"#planos h2\"\\).outerHTML.slice\\(0,700\\)')"
+    ]
+  }
+}

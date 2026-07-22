@@ -1,0 +1,178 @@
+@import "tailwindcss";
+@import "./animation.css";
+
+/* ==========================================================================
+   SUPREME FITNESS — Design System
+   Paleta de 3 cores + off-white. BRIEF §3.
+   ========================================================================== */
+
+@theme {
+  --color-supreme: #e8232a;
+  --color-supreme-escuro: #b8161c;
+  --color-carbono: #0a0a0b;
+  --color-carbono-claro: #131316;
+  --color-aco: #8a8f98;
+  --color-aco-escuro: #3a3d44;
+  --color-branco: #f4f4f2;
+
+  --font-display: "Anton", "Arial Narrow", sans-serif;
+  --font-sans: "Inter", system-ui, sans-serif;
+}
+
+/* --------------------------------------------------------------------------
+   Variáveis do conceito PROGRESSIVE OVERLOAD — BRIEF §2
+   Alimentadas por um único ScrollTrigger global (ver App.jsx).
+   -------------------------------------------------------------------------- */
+:root {
+  --carga: 0; /* 0 → 1240 kg */
+  --wght: 300; /* 300 → 900   */
+  --sat: 0.4; /* 0.4 → 1     */
+  --progresso: 0; /* 0 → 1       */
+}
+
+/* --------------------------------------------------------------------------
+   Base
+   -------------------------------------------------------------------------- */
+html {
+  scroll-behavior: auto; /* o Lenis assume; o nativo só atrapalha */
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background-color: var(--color-carbono);
+  color: var(--color-branco);
+  font-family: var(--font-sans);
+  font-synthesis-weight: none;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* Trava o scroll enquanto o preloader roda */
+body[data-preload="true"] {
+  overflow: hidden;
+}
+
+::selection {
+  background-color: var(--color-supreme);
+  color: var(--color-branco);
+}
+
+/* Acessibilidade: foco sempre visível — LP_GUIDE §7 */
+:focus-visible {
+  outline: 2px solid var(--color-supreme);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+@supports (scrollbar-color: red blue) {
+  html {
+    scrollbar-color: var(--color-aco-escuro) var(--color-carbono);
+    scrollbar-width: thin;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Tipografia
+   -------------------------------------------------------------------------- */
+.fonte-display {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 0.86;
+  text-transform: uppercase;
+}
+
+/* Corpo cujo peso responde ao scroll (variable font) — BRIEF §2 */
+.peso-variavel {
+  font-variation-settings: "wght" var(--wght);
+}
+
+/* Números nunca podem "pular" enquanto o contador anima — BRIEF §3 */
+.tabular {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* Títulos display fluidos, sem media query */
+.titulo-xl {
+  font-size: clamp(2.75rem, 10.5vw, 10rem);
+}
+.titulo-lg {
+  font-size: clamp(2.25rem, 7vw, 6.5rem);
+}
+.titulo-md {
+  font-size: clamp(1.75rem, 4.2vw, 3.25rem);
+}
+
+.texto-contorno {
+  color: transparent;
+  -webkit-text-stroke: 1px var(--color-aco-escuro);
+}
+
+/* --------------------------------------------------------------------------
+   Superfícies e utilitários
+   -------------------------------------------------------------------------- */
+.grade-fundo {
+  background-image: linear-gradient(
+      to right,
+      color-mix(in oklab, var(--color-aco-escuro) 22%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      to bottom,
+      color-mix(in oklab, var(--color-aco-escuro) 22%, transparent) 1px,
+      transparent 1px
+    );
+  background-size: 72px 72px;
+}
+
+/* Grão sutil — textura de filme sem custo de imagem */
+.grao::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.25;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+}
+
+.fade-lateral {
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 6%,
+    #000 94%,
+    transparent
+  );
+  mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
+}
+
+.borda-sutil {
+  border: 1px solid color-mix(in oklab, var(--color-aco) 18%, transparent);
+}
+
+.container-lp {
+  width: 100%;
+  max-width: 88rem;
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+}
+@media (min-width: 768px) {
+  .container-lp {
+    padding-inline: 2.5rem;
+  }
+}
+
+/* Trilho horizontal vira carrossel com snap no mobile — BRIEF §4 (seção 04) */
+.snap-mobile {
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.snap-mobile::-webkit-scrollbar {
+  display: none;
+}
+.snap-mobile > * {
+  scroll-snap-align: center;
+}

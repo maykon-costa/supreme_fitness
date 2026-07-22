@@ -1,0 +1,150 @@
+/* ==========================================================================
+   Animações CSS — o que não precisa de JS mora aqui.
+   Tudo dirigido por scroll está no GSAP. LP_GUIDE §1.
+   ========================================================================== */
+
+/* Máscara de linha para o SplitText — LP_GUIDE §4.5.
+   `.linha-mask` é criada pelo próprio SplitText (mask: "lines"); `.linha-mascara`
+   é a versão manual usada no hero.
+
+   Com `line-height: 0.86` no display, os diacríticos saem da caixa da linha e o
+   overflow da máscara os decepa: "PREÇO" renderizava "PRECO" e "SÉRIE", "SERIE".
+   O padding dá folga à linha — a máscara cresce junto e o acento cabe — e a
+   margem negativa na máscara devolve o espaçamento apertado do display. */
+.linha-mascara,
+.linha-mask {
+  overflow: hidden;
+  display: block;
+  margin-block: -0.14em;
+}
+
+.linha-mascara > *,
+.linha {
+  padding-block: 0.14em;
+}
+
+/* Estado inicial dos elementos que o GSAP vai revelar.
+   Só esconde SE o JS assumiu (`.js-pronto` entra no <html> no mount do App).
+   Sem essa guarda, quem estiver com JS desativado veria títulos invisíveis. */
+.js-pronto .titulo-oculto {
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+/* Marquee infinito — CSS puro, sem custo de JS por frame */
+@keyframes marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.marquee-trilho {
+  display: flex;
+  width: max-content;
+  animation: marquee var(--marquee-dur, 34s) linear infinite;
+}
+.marquee-trilho[data-direcao="reversa"] {
+  animation-direction: reverse;
+}
+
+/* Pausa no hover: cortesia com quem quer ler o conteúdo da faixa */
+.marquee-wrap:hover .marquee-trilho {
+  animation-play-state: paused;
+}
+
+/* Pulso do indicador "aberto agora" */
+@keyframes pulso-vivo {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.45;
+    transform: scale(0.82);
+  }
+}
+.pulso-vivo {
+  animation: pulso-vivo 2.4s ease-in-out infinite;
+}
+
+/* Seta de scroll do hero */
+@keyframes desce {
+  0% {
+    transform: translateY(-38%);
+    opacity: 0;
+  }
+  40% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(38%);
+    opacity: 0;
+  }
+}
+.indicador-scroll {
+  animation: desce 1.9s ease-in-out infinite;
+}
+
+/* Brilho que percorre o botão primário */
+@keyframes varredura {
+  from {
+    transform: translateX(-120%) skewX(-20deg);
+  }
+  to {
+    transform: translateX(320%) skewX(-20deg);
+  }
+}
+.btn-varredura::before {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  width: 38%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgb(255 255 255 / 0.28),
+    transparent
+  );
+  animation: varredura 3.6s ease-in-out infinite;
+  animation-delay: 1s;
+}
+
+/* ==========================================================================
+   prefers-reduced-motion — OBRIGATÓRIO. LP_GUIDE §7
+   O CSS cobre o que é CSS; GSAP e WebGL são tratados no JS
+   (App.jsx e useCan3D.js respectivamente).
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .js-pronto .titulo-oculto {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .marquee-trilho {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  .btn-varredura::before {
+    display: none;
+  }
+
+  /* Sem o motion de scroll, o peso da fonte fica no meio-termo legível */
+  :root {
+    --wght: 500;
+    --sat: 1;
+  }
+}
