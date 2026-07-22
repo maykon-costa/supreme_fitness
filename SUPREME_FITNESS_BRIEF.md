@@ -44,31 +44,71 @@ Todo o motion da LP obedece a uma metáfora única — sobrecarga progressiva. C
 
 | Eixo | Início da página | Fim da página |
 |---|---|---|
+| **Anilhas na barra de supino (HUD fixo)** | **barra vazia, 20 kg** | **6 pares carregados, 180 kg** |
 | Peso da tipografia (variable font) | `wght 300` | `wght 900` |
-| Carga acumulada (contador no HUD lateral) | `0 kg` | `1.240 kg` |
 | Saturação / contraste da paleta | frio, quase mono | vermelho-supreme saturado |
 | Densidade do grid | arejado | compacto, empilhado |
 | Ritmo do scroll (Lenis + scrub) | solto | curto, "travado", pesado |
+
+### O HUD da barra de supino
+
+O eixo principal do conceito. Um chip fixo no canto inferior esquerdo desenha uma
+**barra de supino que ganha um par de anilhas a cada trecho vencido da página**.
+Scrollar deixa de ser "um número subindo" e vira **carregar a barra**.
+
+Por que funciona melhor que um contador:
+- **É discreto, não contínuo.** Cada anilha que entra é um evento com peso — feedback
+  satisfatório, na régua de um "achievement", em vez de um número borrado passando.
+- **O número vira consequência.** 20 → 60 → 100 → 130 → 150 → 170 → 180 kg. Ele anda em
+  degraus porque a carga na barra anda em degraus. Coerência total entre desenho e dado.
+- **A carga é plausível.** 180 kg num supino é impressionante e real. Um contador solto de
+  "1.240 kg" era abstrato e não se ancorava em nada.
+- **Ordem de carregamento é a da academia:** anilha pesada por dentro, leve por fora
+  (`20, 20, 15, 10, 10, 5` por lado).
+
+Custo técnico: **zero**. É SVG (nítido em qualquer tela, roda em celular onde o WebGL
+nem é montado — LP_GUIDE §5.3), alimentado pelo mesmo `ScrollTrigger` global via um store
+que só notifica o React quando o **número de pares** muda — ~6 re-renders na página
+inteira, não 60 por segundo.
+
+Divisão de libs no HUD, sem sobreposição (LP_GUIDE §1):
+GSAP dirige o scroll → Motion anima a entrada de cada anilha (mount/unmount) →
+anime.js tweena o contador de kg.
 
 É um sistema, não um efeito. Isso é o que separa uma LP com animação de uma LP **premiável** — e nenhum
 concorrente de academia no agreste vai ter algo parecido. É o "disruptivo" com significado, não gratuito.
 
 ### Por que isso funciona tecnicamente
 Quase tudo acima custa **quase zero**: é um único `ScrollTrigger` global com `scrub` alimentando
-variáveis CSS (`--carga`, `--wght`, `--sat`). O visual é caríssimo; o bundle é barato.
+variáveis CSS (`--wght`, `--sat`) e um store leve para o HUD. O visual é caríssimo; o bundle é barato.
 
 ```js
-// um ScrollTrigger para o documento inteiro alimenta a página toda
+// src/App.jsx — UM ScrollTrigger para o documento inteiro alimenta a página toda
 ScrollTrigger.create({
   trigger: document.body, start: "top top", end: "bottom bottom", scrub: 0.6,
   onUpdate: (self) => {
     const p = self.progress;
-    document.documentElement.style.setProperty("--carga", Math.round(p * 1240));
-    document.documentElement.style.setProperty("--wght", 300 + p * 600);
-    document.documentElement.style.setProperty("--sat", 0.4 + p * 0.6);
+    const raiz = document.documentElement;
+    raiz.style.setProperty("--progresso", p.toFixed(4));
+    raiz.style.setProperty("--wght", String(Math.round(300 + p * 600)));
+    raiz.style.setProperty("--sat", (0.4 + p * 0.6).toFixed(3));
+    definirProgresso(p); // store da barra — só notifica quando muda de par
   },
 });
 ```
+
+```js
+// src/config/site.js — a barra é dado, não código
+export const supino = {
+  barra: 20,                          // barra olímpica
+  pares: [20, 20, 15, 10, 10, 5],     // kg por lado, pesada por dentro
+  limiares: [0.08, 0.22, 0.37, 0.52, 0.66, 0.8], // ponto do scroll de cada par
+};
+// CARGA_TOTAL = 20 + 2×80 = 180 kg (derivado, não editar à mão)
+```
+
+Ajustar o ritmo de carregamento é mexer em `limiares`. Trocar a progressão de peso é mexer
+em `pares`. Nenhum componente precisa ser tocado.
 
 ---
 

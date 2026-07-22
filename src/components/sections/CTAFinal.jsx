@@ -71,15 +71,13 @@ export function CTAFinal() {
           <BtnAgend texto={site.ctaFinal.cta} origem="cta_final" tamanho="lg" />
         </div>
 
-        {/* O contador de carga crava o valor final — fecha o conceito */}
+        {/* Fecha o conceito: aqui a barra do HUD já está cheia */}
         <p
           data-cta-fade
           className="fonte-display tabular mt-16 text-sm tracking-[0.2em] text-aco-escuro"
         >
-          CARGA TOTAL DA SESSÃO ·{" "}
-          <span className="text-aco">
-            {CARGA_TOTAL.toLocaleString("pt-BR")} KG
-          </span>
+          BARRA CARREGADA ·{" "}
+          <span className="text-aco">{CARGA_TOTAL} KG</span> · SUA VEZ
         </p>
       </div>
     </section>

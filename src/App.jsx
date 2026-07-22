@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { LazyMotion, domAnimation } from "motion/react";
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
 import { initLenis } from "@/lib/lenis";
-import { CARGA_TOTAL } from "@/config/site";
+import { definirProgresso, cravarCargaMaxima } from "@/lib/carga";
 
 import { Preloader } from "@/components/sections/Preloader";
 import { Header } from "@/components/sections/Header";
@@ -16,6 +16,7 @@ import { HorariosLocal } from "@/components/sections/HorariosLocal";
 import { CTAFinal } from "@/components/sections/CTAFinal";
 import { Footer } from "@/components/sections/Footer";
 import { BtnFixo } from "@/components/ui/BtnFixo";
+import { BarraSupino } from "@/components/ui/BarraSupino";
 
 export default function App() {
   // Marca que o JS assumiu: sem isso, quem tiver JS desativado veria a página
@@ -39,13 +40,9 @@ export default function App() {
       // Estado legível fixo, sem motion — LP_GUIDE §7
       raiz.style.setProperty("--wght", "500");
       raiz.style.setProperty("--sat", "1");
-      document.querySelectorAll("[data-carga]").forEach((el) => {
-        el.textContent = CARGA_TOTAL.toLocaleString("pt-BR");
-      });
+      cravarCargaMaxima();
       return;
     }
-
-    const cargas = document.querySelectorAll("[data-carga]");
 
     const st = ScrollTrigger.create({
       trigger: document.body,
@@ -58,10 +55,8 @@ export default function App() {
         raiz.style.setProperty("--wght", String(Math.round(300 + p * 600)));
         raiz.style.setProperty("--sat", (0.4 + p * 0.6).toFixed(3));
 
-        const kg = Math.round(p * CARGA_TOTAL);
-        cargas.forEach((el) => {
-          el.textContent = kg.toLocaleString("pt-BR");
-        });
+        // O store só avisa o HUD quando o número de pares muda — não a cada frame
+        definirProgresso(p);
       },
     });
 
@@ -103,6 +98,7 @@ export default function App() {
       </main>
 
       <Footer />
+      <BarraSupino />
       <BtnFixo />
     </LazyMotion>
   );

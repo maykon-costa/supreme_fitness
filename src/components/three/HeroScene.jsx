@@ -1,39 +1,56 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
+import { supino } from "@/config/site";
+import { assinarCarga } from "@/lib/carga";
 
 /**
- * Cena 3D — a ÚNICA geometria do site. BRIEF §4 (seção 01) e §5.
+ * Cena 3D — a barra de supino do conceito PROGRESSIVE OVERLOAD. BRIEF §2 e §4.
  *
- * Uma anilha de 20kg em metal escovado, girando lento no eixo Y com parallax
- * de mouse suavizado. Reaproveitada no CTA final (mesmo chunk, zero download extra).
+ * Uma barra olímpica em metal escovado que ganha ANILHAS DE VERDADE conforme o
+ * usuário rola: a hero fica presa por um viewport e, nesse trecho, os 6 pares
+ * entram voando e travam na barra. Scrollar é literalmente carregar o supino.
  *
  * Por que three.js puro e não @react-three/fiber:
  * o chunk com R3F fechava 236kb gz, acima do teto de 200kb do LP_GUIDE §6.
- * Para UM mesh, duas luzes e um loop de render, a camada declarativa do R3F
- * custava ~45kb gz sem entregar nada que este arquivo não resolva em 80 linhas.
- * Vale a regra do LP_GUIDE §1: se dá para cortar sem perder efeito, corta.
+ * A camada declarativa custava ~45kb gz sem entregar nada que este arquivo não
+ * resolva. Vale a regra do LP_GUIDE §1: se dá para cortar sem perder efeito, corta.
  *
  * Performance — LP_GUIDE §5.2:
  *   · geometria procedural: nenhum .glb para baixar
- *   · pixel ratio limitado a 1.75
- *   · antialias off (a silhueta é curva e escura, não aparece)
+ *   · UMA geometria de anilha reaproveitada por todas as instâncias (escalada)
+ *   · pixel ratio limitado a 1.75 · antialias off
  *   · loop pausado fora da viewport e com a aba em segundo plano
  *   · pointer-events-none: nunca rouba o clique do CTA
  *
  * Só é montado quando useCan3D() aprova o device.
  */
 
-function criarAnilha() {
+/**
+ * Proporções da barra olímpica. O eixo precisa ser ~3,5× o diâmetro da anilha:
+ * com um eixo curto o objeto lê como HALTER, não como barra de supino.
+ * (Barra real: 2,2 m de eixo para 45 cm de anilha ≈ 4,9×.)
+ */
+const DENTRO = 1.75; // meia-distância entre as presilhas: onde a 1ª anilha encosta
+const FOLGA = 0.022;
+const PONTA = 0.42; // sobra de eixo depois da última anilha
+
+/** Anilha mais pesada = disco maior e mais grosso. Leitura instantânea. */
+function escalaPara(kg) {
+  if (kg >= 20) return 1;
+  if (kg >= 15) return 0.86;
+  if (kg >= 10) return 0.72;
+  return 0.56;
+}
+
+function criarGeometriaAnilha() {
   const shape = new THREE.Shape();
   shape.absarc(0, 0, 1, 0, Math.PI * 2, false);
 
-  // furo central
   const centro = new THREE.Path();
   centro.absarc(0, 0, 0.3, 0, Math.PI * 2, true);
   shape.holes.push(centro);
 
-  // pegadas — o detalhe que faz ler como anilha de verdade
   for (let i = 0; i < 3; i++) {
     const ang = (i / 3) * Math.PI * 2 + Math.PI / 6;
     const furo = new THREE.Path();
@@ -47,11 +64,24 @@ function criarAnilha() {
     bevelThickness: 0.045,
     bevelSize: 0.045,
     bevelSegments: 3,
-    curveSegments: 48,
+    curveSegments: 44,
   });
   geo.center();
   geo.computeVertexNormals();
   return geo;
+}
+
+/** Posição final de cada anilha ao longo da barra, acumulando espessuras. */
+function calcularPosicoes() {
+  const posicoes = [];
+  let borda = DENTRO;
+  for (const kg of supino.pares) {
+    const esc = escalaPara(kg);
+    const espessura = 0.26 * esc;
+    posicoes.push({ x: borda + espessura / 2, escala: esc });
+    borda += espessura + FOLGA;
+  }
+  return { posicoes, bordaFinal: borda };
 }
 
 export default function HeroScene({ variante = "hero" }) {
@@ -86,7 +116,7 @@ export default function HeroScene({ variante = "hero" }) {
       0.1,
       100
     );
-    camera.position.z = 6;
+    camera.position.z = close ? 7 : 8.4;
 
     // ---- environment procedural: reflexo de metal sem baixar HDR ----
     const pmrem = new THREE.PMREMGenerator(renderer);
@@ -94,47 +124,99 @@ export default function HeroScene({ variante = "hero" }) {
     scene.environment = env.texture;
 
     // ---- luzes ----
-    const ambiente = new THREE.AmbientLight(0xffffff, 0.35);
     const principal = new THREE.DirectionalLight(0xffffff, 2.1);
     principal.position.set(4, 5, 5);
-    const contra = new THREE.DirectionalLight(0xe8232a, 1.5);
+    const contra = new THREE.DirectionalLight(0xe8232a, 1.6);
     contra.position.set(-5, -2, -3);
-    scene.add(ambiente, principal, contra);
+    scene.add(new THREE.AmbientLight(0xffffff, 0.35), principal, contra);
 
-    // ---- anilha ----
-    const grupo = new THREE.Group();
-    // A anilha é elemento de apoio, não protagonista: em escala maior ela
-    // invade a headline e derruba o contraste do texto (LP_GUIDE §7).
-    // No CTA final a anilha vira fundo desfocado (ver `filter` no wrapper), não
-    // objeto reconhecível cruzando a headline.
-    grupo.scale.setScalar(close ? 2.4 : 0.92);
-    grupo.rotation.set(0.42, 0, -0.12);
-
-    const geoAnilha = criarAnilha();
-    const matAnilha = new THREE.MeshStandardMaterial({
+    // ---- materiais (compartilhados por todas as instâncias) ----
+    const matMetal = new THREE.MeshStandardMaterial({
       color: 0x1b1c20,
       metalness: 0.94,
       roughness: 0.31,
       envMapIntensity: 1.15,
     });
-    grupo.add(new THREE.Mesh(geoAnilha, matAnilha));
-
-    // aro vermelho na FACE da anilha: leitura de marca sem precisar de textura.
-    // Deitado (rotation.x = PI/2) ele lia como elástico atravessando o furo.
-    const geoAro = new THREE.TorusGeometry(0.43, 0.019, 12, 72);
-    const matAro = new THREE.MeshStandardMaterial({
-      color: 0xe8232a,
-      metalness: 0.5,
-      roughness: 0.28,
-      emissive: 0xe8232a,
-      emissiveIntensity: 0.32,
+    const matBarra = new THREE.MeshStandardMaterial({
+      color: 0x9aa0aa,
+      metalness: 1,
+      roughness: 0.26,
+      envMapIntensity: 1.3,
     });
-    const aro = new THREE.Mesh(geoAro, matAro);
-    aro.position.z = 0.115; // assenta sobre a face frontal, não dentro da massa
-    grupo.add(aro);
+    const matPresilha = new THREE.MeshStandardMaterial({
+      color: 0xe8232a,
+      metalness: 0.55,
+      roughness: 0.3,
+      emissive: 0xe8232a,
+      emissiveIntensity: 0.28,
+    });
+    descartaveis.push(matMetal, matBarra, matPresilha, env.texture);
+
+    // ---- barra ----
+    const grupo = new THREE.Group();
+    grupo.scale.setScalar(close ? 1.15 : 0.62);
+    // 3/4 de perfil: mostra o comprimento da barra e a espessura das anilhas
+    grupo.rotation.set(0.22, -0.24, -0.09);
+
+    const { posicoes, bordaFinal } = calcularPosicoes();
+
+    // O eixo é dimensionado a partir da pilha real de anilhas + a ponta
+    const COMPRIMENTO = 2 * (bordaFinal + PONTA);
+    const geoEixo = new THREE.CylinderGeometry(0.048, 0.048, COMPRIMENTO, 18);
+    const eixo = new THREE.Mesh(geoEixo, matBarra);
+    eixo.rotation.z = Math.PI / 2;
+    grupo.add(eixo);
+    descartaveis.push(geoEixo);
+
+    // presilhas vermelhas: onde as anilhas encostam
+    const geoPresilha = new THREE.CylinderGeometry(0.115, 0.115, 0.09, 20);
+    descartaveis.push(geoPresilha);
+    for (const lado of [-1, 1]) {
+      const p = new THREE.Mesh(geoPresilha, matPresilha);
+      p.rotation.z = Math.PI / 2;
+      p.position.x = lado * (DENTRO - 0.05);
+      grupo.add(p);
+    }
 
     scene.add(grupo);
-    descartaveis.push(geoAnilha, matAnilha, geoAro, matAro, env.texture);
+
+    // ---- anilhas ----
+    const geoAnilha = criarGeometriaAnilha();
+    descartaveis.push(geoAnilha);
+
+    const anilhas = []; // { mesh, alvoX, entrada, lado, escala }
+
+    /**
+     * Enquadramento dirigido pela carga: vazia, a barra fica recuada no canto
+     * inferior direito, longe da headline. Conforme carrega, ela vem para o
+     * centro e cresce — exatamente enquanto o texto da hero desaparece.
+     * Sem isso a barra cruza o título e mata a legibilidade (LP_GUIDE §7).
+     */
+    const enquadramento = { atual: 0, alvo: 0 };
+
+    function sincronizar(pares) {
+      enquadramento.alvo = pares / supino.pares.length;
+      // adiciona os pares que faltam
+      while (anilhas.length < pares * 2) {
+        const indice = Math.floor(anilhas.length / 2);
+        const lado = anilhas.length % 2 === 0 ? -1 : 1;
+        const { x, escala } = posicoes[indice];
+
+        const mesh = new THREE.Mesh(geoAnilha, matMetal);
+        mesh.rotation.y = Math.PI / 2; // face voltada para o eixo da barra
+        mesh.scale.setScalar(escala);
+        grupo.add(mesh);
+
+        anilhas.push({ mesh, alvoX: lado * x, entrada: 0, lado, escala });
+      }
+      // remove se o usuário rolar de volta pra cima
+      while (anilhas.length > pares * 2) {
+        const { mesh } = anilhas.pop();
+        grupo.remove(mesh);
+      }
+    }
+
+    const cancelarAssinatura = assinarCarga(sincronizar);
 
     // ---- interação ----
     const onMove = (e) => {
@@ -145,19 +227,48 @@ export default function HeroScene({ variante = "hero" }) {
 
     // ---- loop ----
     const relogio = new THREE.Clock();
+    const suave = (t) => 1 - Math.pow(1 - t, 3); // easing da entrada da anilha
+    let tempo = 0;
 
     const animar = () => {
       rafId = requestAnimationFrame(animar);
       if (!visivel) return;
 
       const delta = Math.min(relogio.getDelta(), 0.05);
+      const k = 1 - Math.pow(0.001, delta);
+      tempo += delta;
 
-      grupo.rotation.y += delta * 0.34;
+      /**
+       * Balanço em vez de rotação contínua. Girando 360°, a barra passava por
+       * ângulos quase de topo em que as anilhas se sobrepõem e o objeto vira um
+       * borrão — deixava de ler como barra. O seno mantém sempre o 3/4 que
+       * mostra o comprimento do eixo e a espessura da pilha.
+       */
+      grupo.rotation.y =
+        -0.24 + Math.sin(tempo * 0.34) * 0.13 + alvoMouse.x * 0.15;
+
+      // enquadramento: recuada quando vazia, protagonista quando cheia
+      enquadramento.atual += (enquadramento.alvo - enquadramento.atual) * k * 0.55;
+      const t = close ? 1 : enquadramento.atual;
+
+      grupo.scale.setScalar((close ? 1.15 : 0.62 + t * 0.33) * 1);
+      grupo.position.x = close ? 0 : 1.5 - t * 1.45;
 
       // parallax de mouse com lerp — nunca 1:1 (BRIEF §4)
-      const k = 1 - Math.pow(0.001, delta);
-      grupo.rotation.x += (alvoMouse.y * 0.26 - grupo.rotation.x) * k;
-      grupo.position.x += (alvoMouse.x * 0.28 - grupo.position.x) * k;
+      // Começa bem abaixo da headline e sobe só depois que o texto saiu
+      const baseY = close ? 0 : -1.7 + t * 1.6;
+      grupo.rotation.x += (0.22 + alvoMouse.y * 0.16 - grupo.rotation.x) * k;
+      grupo.position.y += (baseY - alvoMouse.y * 0.12 - grupo.position.y) * k;
+
+      // anilha entra deslizando de fora e assenta na presilha
+      for (const a of anilhas) {
+        if (a.entrada < 1) {
+          a.entrada = Math.min(1, a.entrada + delta * 2.4);
+          const t = suave(a.entrada);
+          a.mesh.position.x = a.alvoX + a.lado * (1 - t) * 2.6;
+          a.mesh.scale.setScalar(a.escala * (0.6 + 0.4 * t));
+        }
+      }
 
       renderer.render(scene, camera);
     };
@@ -167,7 +278,7 @@ export default function HeroScene({ variante = "hero" }) {
     const obs = new IntersectionObserver(
       ([entry]) => {
         visivel = entry.isIntersecting && document.visibilityState === "visible";
-        if (visivel) relogio.getDelta(); // descarta o delta acumulado na pausa
+        if (visivel) relogio.getDelta();
       },
       { threshold: 0.01 }
     );
@@ -193,6 +304,7 @@ export default function HeroScene({ variante = "hero" }) {
     // ---- cleanup completo — LP_GUIDE §10 ----
     return () => {
       cancelAnimationFrame(rafId);
+      cancelarAssinatura();
       obs.disconnect();
       ro.disconnect();
       document.removeEventListener("visibilitychange", onVisibilidade);
@@ -211,13 +323,13 @@ export default function HeroScene({ variante = "hero" }) {
       ref={wrap}
       aria-hidden="true"
       className={`pointer-events-none absolute inset-0 z-[1] ${
-        close ? "opacity-30" : "opacity-80"
+        close ? "opacity-30" : "opacity-90"
       }`}
       style={{
-        transform: close ? "none" : "translateX(31%)",
-        // Profundidade de campo no CTA: sem o desfoque, os furos de pegada e o
-        // aro vermelho disputam leitura com a headline que está por cima.
-        // Só roda no desktop — o useCan3D já barra mobile.
+        // O deslocamento agora é feito em 3D (dirigido pela carga), não em CSS
+        transform: "none",
+        // Profundidade de campo no CTA: sem o desfoque a barra disputa leitura
+        // com a headline que está por cima. Só roda no desktop (useCan3D barra mobile).
         filter: close ? "blur(7px)" : "none",
       }}
     />

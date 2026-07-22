@@ -5,7 +5,11 @@
  */
 import { useEffect, useState } from "react";
 
-function avaliar() {
+/**
+ * Checagem síncrona. Necessária para decidir o pin da hero ANTES do primeiro
+ * scroll — o hook assíncrono resolveria tarde e o pin nasceria dando salto.
+ */
+export function podeUsar3D() {
   if (typeof window === "undefined") return false;
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return false;
   if (navigator.connection?.saveData) return false;
@@ -30,8 +34,8 @@ export function useCan3D() {
   useEffect(() => {
     // Adiado para não competir com o LCP
     const id = window.requestIdleCallback
-      ? window.requestIdleCallback(() => setCan3D(avaliar()), { timeout: 2000 })
-      : window.setTimeout(() => setCan3D(avaliar()), 1200);
+      ? window.requestIdleCallback(() => setCan3D(podeUsar3D()), { timeout: 2000 })
+      : window.setTimeout(() => setCan3D(podeUsar3D()), 1200);
 
     return () => {
       if (window.cancelIdleCallback) window.cancelIdleCallback(id);

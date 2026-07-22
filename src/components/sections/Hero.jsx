@@ -1,8 +1,9 @@
 import { Suspense, lazy, useRef } from "react";
 import { ArrowDown } from "lucide-react";
-import { gsap, useGSAP } from "@/lib/gsap";
-import { site, CARGA_TOTAL } from "@/config/site";
-import { useCan3D } from "@/hooks/useCan3D";
+import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
+import { site } from "@/config/site";
+import { useCan3D, podeUsar3D } from "@/hooks/useCan3D";
+import { assumirControleHero, definirProgressoHero } from "@/lib/carga";
 import { scrollTo } from "@/lib/lenis";
 import { BtnAgend } from "@/components/ui/BtnAgend";
 import { Foto } from "@/components/ui/Foto";
@@ -19,31 +20,6 @@ export function Hero() {
     () => {
       if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-      // Parallax de saída do hero: o fundo sobe mais devagar que o texto
-      gsap.to("[data-hero-fundo]", {
-        yPercent: 18,
-        scale: 1.08,
-        ease: "none",
-        scrollTrigger: {
-          trigger: root.current,
-          start: "top top",
-          end: "bottom top",
-          scrub: true,
-        },
-      });
-
-      gsap.to("[data-hero-conteudo]", {
-        yPercent: -12,
-        opacity: 0,
-        ease: "none",
-        scrollTrigger: {
-          trigger: root.current,
-          start: "top top",
-          end: "bottom 30%",
-          scrub: true,
-        },
-      });
-
       // Entrada dos blocos de apoio (a headline tem seu próprio reveal)
       gsap.from("[data-hero-fade]", {
         y: 26,
@@ -53,6 +29,96 @@ export function Hero() {
         delay: 1.35, // depois do preloader
         ease: "expo.out",
       });
+
+      const mm = gsap.matchMedia();
+
+      /**
+       * COM 3D: a hero fica presa por UM viewport e, nesse trecho, os 6 pares
+       * de anilha entram na barra. É o momento em que "scrollar é carregar".
+       * Teto de 1 viewport extra é a regra do BRIEF §6 contra scroll-jacking.
+       */
+      mm.add(
+        {
+          comPin: "(min-width: 1024px) and (prefers-reduced-motion: no-preference)",
+        },
+        (ctx) => {
+          if (!ctx.conditions.comPin || !podeUsar3D()) return;
+
+          assumirControleHero();
+
+          const conteudo = root.current.querySelector("[data-hero-conteudo]");
+
+          const st = ScrollTrigger.create({
+            trigger: root.current,
+            start: "top top",
+            end: () => "+=" + window.innerHeight,
+            pin: true,
+            pinSpacing: true,
+            scrub: true,
+            anticipatePin: 1,
+            invalidateOnRefresh: true,
+            onUpdate: (self) => {
+              const p = self.progress;
+              definirProgressoHero(p);
+
+              /**
+               * O fade do texto sai DAQUI, do mesmo progresso do pin, e não de
+               * um segundo ScrollTrigger: dois triggers no mesmo elemento pinado
+               * disputam a ordem de refresh e o fade ficava fora de sincronia
+               * com a barra, que então cruzava a headline.
+               *
+               * Some até 30% do pin. A barra carregada é longa e atravessa a
+               * tela em qualquer posição, então a janela de sobreposição com a
+               * headline precisa ser curta — senão vira um cruzamento ilegível.
+               */
+              const saida = gsap.utils.clamp(0, 1, p / 0.3);
+              gsap.set(conteudo, {
+                opacity: 1 - saida,
+                yPercent: -7 * saida,
+              });
+            },
+          });
+
+          return () => {
+            st.kill();
+            gsap.set(conteudo, { clearProps: "opacity,transform" });
+          };
+        }
+      );
+
+      /** SEM 3D (mobile ou sem WebGL): nada de pin — só o parallax de saída. */
+      mm.add(
+        {
+          semPin: "(max-width: 1023px), (prefers-reduced-motion: reduce)",
+        },
+        () => {
+          gsap.to("[data-hero-fundo]", {
+            yPercent: 18,
+            scale: 1.08,
+            ease: "none",
+            scrollTrigger: {
+              trigger: root.current,
+              start: "top top",
+              end: "bottom top",
+              scrub: true,
+            },
+          });
+
+          gsap.to("[data-hero-conteudo]", {
+            yPercent: -12,
+            opacity: 0,
+            ease: "none",
+            scrollTrigger: {
+              trigger: root.current,
+              start: "top top",
+              end: "bottom 30%",
+              scrub: true,
+            },
+          });
+        }
+      );
+
+      return () => mm.revert();
     },
     { scope: root }
   );
@@ -138,22 +204,8 @@ export function Hero() {
         </div>
       </div>
 
-      {/* HUD de carga — assina o conceito Progressive Overload desde o 1º frame */}
-      <div
-        data-hero-fade
-        className="absolute right-5 bottom-8 z-10 hidden text-right md:block md:right-10"
-      >
-        <p className="text-[10px] font-semibold tracking-[0.28em] text-aco uppercase">
-          Carga da sessão
-        </p>
-        <p className="fonte-display tabular mt-1 text-4xl leading-none">
-          <span data-carga>0</span>
-          <span className="text-supreme">kg</span>
-        </p>
-        <p className="tabular mt-1 text-[10px] text-aco-escuro">
-          de {CARGA_TOTAL.toLocaleString("pt-BR")} kg
-        </p>
-      </div>
+      {/* O HUD de carga virou persistente (BarraSupino, montado no App):
+          a barra acompanha o usuário a página inteira em vez de morrer no hero. */}
 
       <button
         type="button"

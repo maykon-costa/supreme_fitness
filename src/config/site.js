@@ -224,5 +224,25 @@ export const site = {
   },
 };
 
-/** Carga total acumulada no HUD do conceito Progressive Overload (kg). */
-export const CARGA_TOTAL = 1240;
+/**
+ * PROGRESSIVE OVERLOAD — a barra de supino do HUD (BRIEF §2).
+ *
+ * Em vez de um número abstrato subindo, a barra ganha um PAR de anilhas a cada
+ * trecho vencido da página. O número passa a ser consequência do que está na
+ * barra, não um contador solto — por isso ele anda em degraus, não linearmente.
+ *
+ * Ordem de carregamento é a real da academia: anilha pesada por dentro,
+ * leve por fora. Carga final = 20 + 2×(20+20+15+10+10+5) = 180 kg.
+ */
+export const supino = {
+  barra: 20, // barra olímpica
+  pares: [20, 20, 15, 10, 10, 5], // kg de cada anilha, por lado
+
+  // Ponto do scroll (0–1) em que cada par entra na barra.
+  // Espaçados para cair perto da virada de cada seção.
+  limiares: [0.08, 0.22, 0.37, 0.52, 0.66, 0.8],
+};
+
+/** Carga final na barra, em kg. Derivada — não editar à mão. */
+export const CARGA_TOTAL =
+  supino.barra + supino.pares.reduce((soma, kg) => soma + kg * 2, 0);

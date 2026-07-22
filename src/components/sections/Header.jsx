@@ -95,13 +95,19 @@ export function Header() {
               {status.rotulo}
             </span>
 
-            <BtnAgend
-              texto="Aula grátis"
-              origem="header"
-              tamanho="sm"
-              icone={false}
-              className="hidden sm:inline-flex"
-            />
+            {/* O display fica no wrapper, não no botão: BtnAgend já traz
+                `inline-flex` na base e o CSS gera `.hidden` ANTES de
+                `.inline-flex`, então um `hidden` passado via className perdia
+                por ordem de folha de estilo e o botão vazava no mobile.
+                No celular quem cobre o CTA persistente é o BtnFixo. */}
+            <span className="hidden sm:block">
+              <BtnAgend
+                texto="Aula grátis"
+                origem="header"
+                tamanho="sm"
+                icone={false}
+              />
+            </span>
 
             <button
               type="button"
