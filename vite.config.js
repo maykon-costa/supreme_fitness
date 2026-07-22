@@ -5,6 +5,11 @@ import { fileURLToPath, URL } from "node:url";
 
 // LP_GUIDE §6 — code splitting
 export default defineConfig({
+  // GitHub Pages de projeto serve em /<repo>/, então os assets precisam desse
+  // prefixo. O workflow define VITE_BASE; com domínio próprio (public/CNAME)
+  // ele passa "/" e nada muda. Local continua em "/".
+  base: process.env.VITE_BASE || "/",
+
   plugins: [react(), tailwindcss()],
 
   resolve: {

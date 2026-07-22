@@ -10,7 +10,9 @@
       "Bash(grep -oE \"R\\\\\\\\$</span>[^!]{0,120}\" /tmp/dom.html)",
       "Bash(\"/c/Program Files/Google/Chrome/Application/chrome.exe\" --headless=new --disable-gpu --no-sandbox --enable-logging=stderr --v=0 --virtual-time-budget=7000 --dump-dom http://localhost:4173/)",
       "Bash(\"/c/Program Files/Google/Chrome/Application/chrome.exe\" --headless=new --no-sandbox --window-size=1440,900 --use-gl=swiftshader --enable-unsafe-swiftshader --enable-logging=stderr --v=0 --virtual-time-budget=9000 --dump-dom http://localhost:4173/)",
-      "Bash(node eval.mjs \"http://localhost:4173/\" 'document.querySelector\\(\"#planos h2\"\\).outerHTML.slice\\(0,700\\)')"
+      "Bash(node eval.mjs \"http://localhost:4173/\" 'document.querySelector\\(\"#planos h2\"\\).outerHTML.slice\\(0,700\\)')",
+      "Bash(gh auth *)",
+      "Bash(VITE_BASE=/supreme_fitness/ npm run build)"
     ]
   }
 }

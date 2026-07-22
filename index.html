@@ -12,7 +12,10 @@
       content="Musculação, funcional, cross e dança em Santa Cruz do Capibaribe. Aberto das 5h às 22h para quem trabalha. Agende sua aula experimental grátis."
     />
     <meta name="robots" content="index, follow" />
-    <link rel="canonical" href="https://supremefitness.com.br/" />
+    <!-- %VITE_SITE_URL% é substituído pelo Vite no build (workflow define o valor).
+         OG e canonical EXIGEM URL absoluta: o Vite não reescreve `content` de
+         <meta>, então caminho relativo daria 404 fora da raiz. -->
+    <link rel="canonical" href="%VITE_SITE_URL%/" />
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
@@ -26,14 +29,15 @@
       property="og:description"
       content="A cidade trabalha. A gente treina. Aberto das 5h às 22h. Aula experimental grátis."
     />
-    <meta property="og:image" content="/og-image.jpg" />
+    <!-- PENDENTE: gerar og-image.jpg 1200x630 e colocar em /public.
+         Sem ela o link no WhatsApp aparece sem miniatura. -->
+    <meta property="og:image" content="%VITE_SITE_URL%/og-image.jpg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:url" content="https://supremefitness.com.br" />
+    <meta property="og:url" content="%VITE_SITE_URL%/" />
     <meta name="twitter:card" content="summary_large_image" />
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
     <!-- Fonts — 1 único request, LP_GUIDE §10 -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -49,8 +53,8 @@
         "@context": "https://schema.org",
         "@type": "ExerciseGym",
         "name": "Supreme Fitness",
-        "image": "https://supremefitness.com.br/og-image.jpg",
-        "url": "https://supremefitness.com.br",
+        "image": "%VITE_SITE_URL%/og-image.jpg",
+        "url": "%VITE_SITE_URL%",
         "telephone": "+5581989957810",
         "email": "academiasupreme@gmail.com",
         "priceRange": "$$",

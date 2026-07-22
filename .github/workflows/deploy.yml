@@ -1,0 +1,89 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  # Permite rodar manualmente pela aba Actions
+  workflow_dispatch:
+
+# Permissões mínimas para publicar no GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Um deploy por vez; não cancela o que já está no ar
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Listar pendências com o cliente
+        # Informativo: não deve bloquear o deploy, só deixar visível no log
+        # o que ainda falta confirmar (preços, fotos, depoimentos).
+        run: npm run pendencias || true
+
+      - uses: actions/configure-pages@v5
+        id: pages
+
+      - name: Definir base path e URL absoluta
+        # Domínio próprio (public/CNAME) serve na raiz.
+        # Sem domínio, GitHub Pages serve em /<repo>/.
+        # VITE_SITE_URL alimenta canonical, Open Graph e JSON-LD (sem barra final).
+        env:
+          PAGES_URL: ${{ steps.pages.outputs.base_url }}
+        run: |
+          if [ -f public/CNAME ]; then
+            DOMINIO="$(tr -d '[:space:]' < public/CNAME)"
+            echo "VITE_BASE=/" >> "$GITHUB_ENV"
+            echo "VITE_SITE_URL=https://${DOMINIO}" >> "$GITHUB_ENV"
+          else
+            echo "VITE_BASE=/${{ github.event.repository.name }}/" >> "$GITHUB_ENV"
+            echo "VITE_SITE_URL=${PAGES_URL%/}" >> "$GITHUB_ENV"
+          fi
+
+      - name: Build
+        env:
+          # ATENÇÃO: tudo com prefixo VITE_ é inlinado no bundle e fica PÚBLICO.
+          # Por isso são Variables do repositório, não Secrets — Secret aqui daria
+          # uma falsa sensação de sigilo. Não coloque nada realmente sensível.
+          # Configure em: Settings → Secrets and variables → Actions → Variables
+          VITE_WHATSAPP_PHONE: ${{ vars.VITE_WHATSAPP_PHONE || '5581989957810' }}
+          VITE_WHATSAPP_MESSAGE: ${{ vars.VITE_WHATSAPP_MESSAGE || 'Olá! Quero agendar minha aula experimental grátis na Supreme Fitness.' }}
+          VITE_EMAIL: ${{ vars.VITE_EMAIL || 'academiasupreme@gmail.com' }}
+        run: npm run build
+
+      - name: SPA fallback (404 = index)
+        # A LP é de página única com âncoras, mas isso evita 404 feio
+        # se alguém acessar uma rota inexistente.
+        run: cp dist/index.html dist/404.html
+
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
