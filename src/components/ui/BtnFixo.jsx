@@ -49,7 +49,7 @@ export function BtnFixo() {
             type="button"
             onClick={() => handleWhatsAppClick("btn_fixo")}
             aria-label="Agendar aula experimental grátis pelo WhatsApp"
-            className="group flex h-14 items-center gap-3 rounded-full bg-supreme pr-5 pl-4 font-semibold tracking-wide text-branco shadow-[0_12px_40px_-8px_rgba(232,35,42,0.7)] transition-colors duration-300 hover:bg-supreme-escuro md:h-16 md:pr-7 md:pl-5"
+            className="group flex h-14 items-center gap-3 rounded-full bg-supreme pr-5 pl-4 font-semibold tracking-wide text-carbono shadow-[0_12px_40px_-8px_rgba(255,187,0,0.6)] transition-colors duration-300 hover:bg-supreme-escuro md:h-16 md:pr-7 md:pl-5"
           >
             <MessageCircle size={22} strokeWidth={2.2} aria-hidden="true" />
             <span className="text-xs uppercase md:text-sm">

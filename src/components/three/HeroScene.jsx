@@ -126,7 +126,7 @@ export default function HeroScene({ variante = "hero" }) {
     // ---- luzes ----
     const principal = new THREE.DirectionalLight(0xffffff, 2.1);
     principal.position.set(4, 5, 5);
-    const contra = new THREE.DirectionalLight(0xe8232a, 1.6);
+    const contra = new THREE.DirectionalLight(0xffbb00, 1.6);
     contra.position.set(-5, -2, -3);
     scene.add(new THREE.AmbientLight(0xffffff, 0.35), principal, contra);
 
@@ -144,10 +144,10 @@ export default function HeroScene({ variante = "hero" }) {
       envMapIntensity: 1.3,
     });
     const matPresilha = new THREE.MeshStandardMaterial({
-      color: 0xe8232a,
+      color: 0xffbb00,
       metalness: 0.55,
       roughness: 0.3,
-      emissive: 0xe8232a,
+      emissive: 0xffbb00,
       emissiveIntensity: 0.28,
     });
     descartaveis.push(matMetal, matBarra, matPresilha, env.texture);

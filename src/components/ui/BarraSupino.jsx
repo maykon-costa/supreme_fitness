@@ -192,7 +192,7 @@ export function BarraSupino() {
                   width={LARGURA - 3}
                   height="2"
                   rx="1"
-                  fill="#E8232A"
+                  fill="#FFBB00"
                   opacity="0.9"
                 />
               </m.g>

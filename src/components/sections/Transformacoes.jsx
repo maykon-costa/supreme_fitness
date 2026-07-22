@@ -78,12 +78,12 @@ function CardTransformacao({ caso }) {
         <span
           data-linha-wipe
           aria-hidden="true"
-          className="absolute inset-y-0 w-0.5 bg-supreme shadow-[0_0_20px_rgba(232,35,42,0.8)]"
+          className="absolute inset-y-0 w-0.5 bg-supreme shadow-[0_0_20px_rgba(255,187,0,0.75)]"
         />
 
         <div className="pointer-events-none absolute inset-x-0 top-0 flex justify-between p-4 text-[10px] font-semibold tracking-[0.2em] uppercase">
           <span className="bg-carbono/75 px-2 py-1 backdrop-blur-sm">Antes</span>
-          <span className="bg-supreme px-2 py-1">Depois</span>
+          <span className="bg-supreme px-2 py-1 text-carbono">Depois</span>
         </div>
       </div>
 

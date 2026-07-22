@@ -7,8 +7,16 @@
    ========================================================================== */
 
 @theme {
-  --color-supreme: #e8232a;
-  --color-supreme-escuro: #b8161c;
+  /**
+   * Amarelo da marca Supreme Fitness.
+   *
+   * ATENÇÃO DE CONTRASTE: diferente do vermelho anterior, este amarelo é uma
+   * cor CLARA (luminância 0.57). Contra o carbono dá 11.6:1 — ótimo para texto
+   * e ícones. Mas contra o off-white dá 1.5:1, então TEXTO SOBRE FUNDO AMARELO
+   * TEM QUE SER `text-carbono`, nunca `text-branco`. LP_GUIDE §7.
+   */
+  --color-supreme: #ffbb00;
+  --color-supreme-escuro: #e5a600; /* hover: 9.2:1 com carbono */
   --color-carbono: #0a0a0b;
   --color-carbono-claro: #131316;
   --color-aco: #8a8f98;

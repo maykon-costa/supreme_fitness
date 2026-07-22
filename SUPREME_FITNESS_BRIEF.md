@@ -116,11 +116,29 @@ em `pares`. Nenhum componente precisa ser tocado.
 
 ### Paleta — 3 cores, ponto final
 ```
---supreme-red   #E8232A   ← ação, CTA, acento. Herdado da marca
+--supreme       #FFBB00   ← ação, CTA, acento. Amarelo oficial da academia
+--supreme-esc   #E5A600   ← hover do amarelo
 --carbono       #0A0A0B   ← fundo dominante. Preto com leve azul, não puro
 --aco           #8A8F98   ← metal escovado, textos secundários
 --branco        #F4F4F2   ← off-white, nunca #FFF (agride em fundo escuro)
 ```
+
+⚠️ **Regra de contraste do amarelo.** Diferente de um vermelho, `#FFBB00` é uma cor
+**clara**. Os números:
+
+| Combinação | Contraste | Veredito |
+|---|---|---|
+| Amarelo sobre carbono (texto, ícone, borda) | **11,6:1** | ✅ ótimo |
+| Carbono sobre amarelo (texto em botão/faixa) | **11,6:1** | ✅ ótimo |
+| Off-white sobre amarelo | **1,5:1** | ❌ ilegível |
+
+Ou seja: **todo texto sobre fundo amarelo é `text-carbono`, nunca `text-branco`.**
+Vale para botão primário, botão fixo, faixa de prova, selo "mais escolhido",
+selo "Depois" e link de pular conteúdo.
+
+Efeito colateral positivo da troca: o vermelho antigo dava só 4,4:1 contra o
+carbono, ou seja, reprovava no mínimo de 4,5:1 para texto normal (LP_GUIDE §7).
+O amarelo resolve isso — texto e detalhes de acento passaram a ser legíveis.
 Fundo escuro é decisão estratégica: academia é ambiente noturno/industrial, foto de treino fica melhor
 sobre preto, e economiza bateria em OLED.
 

@@ -25,8 +25,9 @@ export function BtnAgend({
   };
 
   const variantes = {
+    // text-carbono, não text-branco: branco sobre o amarelo da marca dá 1.5:1
     primario:
-      "btn-varredura bg-supreme text-branco hover:bg-supreme-escuro shadow-[0_0_0_0_rgba(232,35,42,0.5)] hover:shadow-[0_10px_40px_-8px_rgba(232,35,42,0.65)]",
+      "btn-varredura bg-supreme text-carbono hover:bg-supreme-escuro shadow-[0_0_0_0_rgba(255,187,0,0.5)] hover:shadow-[0_10px_40px_-8px_rgba(255,187,0,0.55)]",
     contorno:
       "borda-sutil bg-transparent text-branco hover:border-supreme hover:bg-supreme/10",
     claro: "bg-branco text-carbono hover:bg-aco",

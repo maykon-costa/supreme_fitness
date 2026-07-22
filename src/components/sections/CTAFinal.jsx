@@ -35,7 +35,7 @@ export function CTAFinal() {
       id="cta-final"
       className="grao relative flex min-h-[92svh] items-center overflow-hidden border-t border-aco-escuro/40"
     >
-      <div className="absolute inset-0 bg-[radial-gradient(85%_60%_at_50%_100%,rgba(232,35,42,0.22)_0%,transparent_70%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(85%_60%_at_50%_100%,rgba(255,187,0,0.16)_0%,transparent_70%)]" />
       <div className="grade-fundo absolute inset-0 opacity-25" />
 
       {can3D && (

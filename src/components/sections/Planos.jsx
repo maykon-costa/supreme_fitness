@@ -61,7 +61,7 @@ function CardPlano({ plano }) {
       }`}
     >
       {plano.destaque && (
-        <span className="absolute -top-3 left-7 bg-supreme px-3 py-1 text-[10px] font-bold tracking-[0.18em] text-branco uppercase">
+        <span className="absolute -top-3 left-7 bg-supreme px-3 py-1 text-[10px] font-bold tracking-[0.18em] text-carbono uppercase">
           {plano.chamada}
         </span>
       )}
