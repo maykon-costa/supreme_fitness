@@ -1,18 +1,20 @@
+import { urlDaImagem } from "@/lib/imagens";
+
 /**
  * Slot de imagem com placeholder procedural.
  *
- * O projeto ainda não tem o material fotográfico do cliente (BRIEF §3 e §6:
- * "Zero banco de imagens"). Até a sessão de fotos acontecer, este componente
- * desenha um placeholder que ocupa o espaço exato da foto final e descreve
- * qual imagem vai ali — assim o layout já é o definitivo.
+ * PARA COLOCAR UMA FOTO: salve o arquivo em `src/assets/imgs/` com o nome do
+ * slot (`slot="hero"` → `src/assets/imgs/hero.webp`). Nada mais precisa mudar.
  *
- * Para trocar por foto real basta passar `src` (e opcionalmente `srcAvif`):
- *   <Foto src={ganho} alt="Aluno treinando no rack" ratio="4/5" />
+ * Enquanto o arquivo não existir, desenha um placeholder que ocupa o espaço
+ * exato da foto final e descreve qual imagem vai ali — o layout já é o
+ * definitivo e a página nunca quebra por falta de imagem (BRIEF §3 e §6).
  *
- * LP_GUIDE §9: .avif com fallback .webp, width/height explícitos (CLS),
+ * LP_GUIDE §9: .avif/.webp, width/height explícitos (CLS),
  * loading lazy abaixo do fold, fetchpriority high no hero.
  */
 export function Foto({
+  slot,
   src,
   srcAvif,
   alt = "",
@@ -25,8 +27,10 @@ export function Foto({
   children,
 }) {
   const estilo = { aspectRatio: ratio };
+  // `src` explícito ainda funciona; o slot é o caminho preferido
+  const fonte = src ?? urlDaImagem(slot);
 
-  if (src) {
+  if (fonte) {
     return (
       <figure
         className={`relative overflow-hidden bg-carbono-claro ${className}`}
@@ -35,7 +39,7 @@ export function Foto({
         <picture>
           {srcAvif && <source srcSet={srcAvif} type="image/avif" />}
           <img
-            src={src}
+            src={fonte}
             alt={alt}
             width={width}
             height={height}
@@ -70,13 +74,21 @@ export function Foto({
         </span>
       </div>
 
-      {brief && (
+      {(brief || slot) && (
         <div className="absolute inset-x-0 bottom-0 p-3 md:p-4">
           <p className="border-l-2 border-supreme pl-2.5 text-[10px] leading-snug font-medium tracking-wide text-aco uppercase md:text-[11px]">
             Foto pendente
-            <span className="mt-0.5 block text-[11px] normal-case md:text-xs">
-              {brief}
-            </span>
+            {brief && (
+              <span className="mt-0.5 block text-[11px] normal-case md:text-xs">
+                {brief}
+              </span>
+            )}
+            {/* o nome exato do arquivo a salvar — some sozinho quando existir */}
+            {slot && (
+              <span className="mt-1 block font-mono text-[10px] normal-case text-supreme">
+                imgs/{slot}.webp
+              </span>
+            )}
           </p>
         </div>
       )}

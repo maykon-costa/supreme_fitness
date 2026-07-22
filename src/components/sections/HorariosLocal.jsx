@@ -91,6 +91,7 @@ export function HorariosLocal() {
           <div>
             {/* PENDENTE: trocar por mapa com tema dark customizado + pin real */}
             <Foto
+              slot="fachada"
               ratio="4/3"
               alt="Fachada da Supreme Fitness"
               brief="Fachada da academia à noite, letreiro aceso. Substituir depois por mapa dark com o pin."

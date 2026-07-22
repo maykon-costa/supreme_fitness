@@ -143,6 +143,7 @@ export function Hero() {
           O LCP sai daqui, nunca do <canvas>. */}
       <div data-hero-fundo className="absolute inset-0">
         <Foto
+          slot="hero"
           ratio="auto"
           prioridade
           className="h-full w-full"

@@ -86,6 +86,7 @@ export function Estrutura() {
             >
               <Foto
                 ratio="3/4"
+                slot="estrutura-salao"
                 alt="Área de musculação da Supreme Fitness"
                 brief="Plano geral do salão de musculação, vazio, luz de fim de tarde."
                 className="scale-[1.02]"
@@ -98,6 +99,7 @@ export function Estrutura() {
             >
               <Foto
                 ratio="4/5"
+                slot="estrutura-aluno"
                 alt="Aluno treinando com peso livre"
                 brief="Aluno real no rack de agachamento, close médio, foco no esforço."
               />
@@ -109,6 +111,7 @@ export function Estrutura() {
             >
               <Foto
                 ratio="1/1"
+                slot="estrutura-detalhe"
                 alt="Detalhe de equipamento"
                 brief="Detalhe macro: anilha, barra ou halter com a marca visível."
               />

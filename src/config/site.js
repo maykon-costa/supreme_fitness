@@ -73,36 +73,42 @@ export const site = {
   modalidades: [
     {
       nome: "Musculação",
+      imagem: "modalidade-musculacao",
       texto:
         "Área de peso livre e máquinas para todos os grupos musculares, com professor em sala o dia inteiro.",
       tag: "Todos os níveis",
     },
     {
       nome: "Funcional",
+      imagem: "modalidade-funcional",
       texto:
         "Treino em circuito, alta intensidade e pouco tempo. Feito pra quem tem 45 minutos e quer resultado.",
       tag: "45 min",
     },
     {
       nome: "Cross",
+      imagem: "modalidade-cross",
       texto:
         "Força, condicionamento e comunidade. Turmas com horário fixo e progressão acompanhada.",
       tag: "Turmas fixas",
     },
     {
       nome: "Dança e Ritmos",
+      imagem: "modalidade-danca",
       texto:
         "Queima calórica alta sem parecer treino. As turmas mais cheias da casa — chegue cedo.",
       tag: "Mais procurada",
     },
     {
       nome: "Avaliação Física",
+      imagem: "modalidade-avaliacao",
       texto:
         "Bioimpedância, dobras e plano de treino individual. Refeita a cada 3 meses para medir o que mudou.",
       tag: "Incluso nos planos",
     },
     {
       nome: "Personal Trainer",
+      imagem: "modalidade-personal",
       texto:
         "Acompanhamento individual com profissional registrado, para objetivo específico ou retorno pós-lesão.",
       tag: "Sob agendamento",
@@ -113,6 +119,8 @@ export const site = {
   transformacoes: [
     {
       nome: "PENDENTE — Aluno 01",
+      imagemAntes: "transformacao-1-antes",
+      imagemDepois: "transformacao-1-depois",
       semanas: 24,
       metrica: 14,
       metricaSufixo: "kg",
@@ -122,6 +130,8 @@ export const site = {
     },
     {
       nome: "PENDENTE — Aluno 02",
+      imagemAntes: "transformacao-2-antes",
+      imagemDepois: "transformacao-2-depois",
       semanas: 36,
       metrica: 9,
       metricaSufixo: "kg",
@@ -130,6 +140,8 @@ export const site = {
     },
     {
       nome: "PENDENTE — Aluno 03",
+      imagemAntes: "transformacao-3-antes",
+      imagemDepois: "transformacao-3-depois",
       semanas: 16,
       metrica: 11,
       metricaSufixo: "kg",
@@ -138,6 +150,8 @@ export const site = {
     },
     {
       nome: "PENDENTE — Aluno 04",
+      imagemAntes: "transformacao-4-antes",
+      imagemDepois: "transformacao-4-depois",
       semanas: 52,
       metrica: 22,
       metricaSufixo: "kg",

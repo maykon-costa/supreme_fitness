@@ -74,6 +74,7 @@ export function Modalidades() {
             className="group borda-sutil relative w-[78vw] shrink-0 overflow-hidden bg-carbono-claro transition-colors duration-500 hover:border-supreme sm:w-[58vw] md:w-[40vw] lg:w-[26rem]"
           >
             <Foto
+              slot={m.imagem}
               ratio="4/3"
               alt={`Aula de ${m.nome} na Supreme Fitness`}
               brief={`Foto real de uma aula de ${m.nome.toLowerCase()}, movimento e rosto de aluno.`}

@@ -60,6 +60,7 @@ function CardTransformacao({ caso }) {
       <div className="relative overflow-hidden">
         {/* ANTES */}
         <Foto
+          slot={caso.imagemAntes}
           ratio="4/5"
           alt={`${caso.nome} antes do treino`}
           brief="Foto ANTES — mesma pose, mesma luz, mesmo enquadramento da foto DEPOIS."
@@ -68,6 +69,7 @@ function CardTransformacao({ caso }) {
         {/* DEPOIS, revelado pelo scroll */}
         <div data-depois className="absolute inset-0" style={{ willChange: "clip-path" }}>
           <Foto
+            slot={caso.imagemDepois}
             ratio="4/5"
             alt={`${caso.nome} depois de ${caso.semanas} semanas de treino`}
             brief="Foto DEPOIS — obrigatoriamente mesma pose, luz e enquadramento."
