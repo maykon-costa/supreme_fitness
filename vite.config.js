@@ -22,7 +22,7 @@ export default defineConfig({
     rollupOptions: {
       output: {
         // Vite 8 roda em Rolldown: manualChunks SÓ aceita função.
-        // O formato objeto do LP_GUIDE §6 quebra o build aqui.
+        // O formato objeto quebra o build — LP_GUIDE §12.1.
         manualChunks(id) {
           if (!id.includes("node_modules")) return;
           if (/[\\/]node_modules[\\/](three|@react-three)[\\/]/.test(id)) return "three";
